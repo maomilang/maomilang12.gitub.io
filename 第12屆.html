@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>風險管理基本能力測驗 — 第12屆</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+--ink: #1a1208;
+--paper: #f5f0e8;
+--paper2: #ede7d8;
+--gold: #c8952a;
+--gold-light: #e8b84b;
+--red: #b83232;
+--green: #2a7a3a;
+--accent: #5a3e1b;
+--line: #c8b89a;
+--shadow: rgba(26,18,8,0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(--paper);
+color: var(--ink);
+font-family: 'Noto Serif TC', serif;
+min-height: 100vh;
+background-image:
+repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 27px, var(--line) 28px);
+background-attachment: fixed;
+}
+
+/* ── COVER ── */
+#cover {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 2rem;
+text-align: center;
+padding: 3rem 1.5rem;
+position: relative;
+}
+#cover::before {
+content: '';
+position: fixed; inset: 0;
+background: radial-gradient(ellipse at 60% 30%, #e8d8b0 0%, transparent 70%),
+radial-gradient(ellipse at 20% 80%, #d4c49a 0%, transparent 60%);
+pointer-events: none;
+}
+.cover-badge {
+font-family: 'JetBrains Mono', monospace;
+font-size: .75rem;
+letter-spacing: .2em;
+color: var(--gold);
+border: 1px solid var(--gold);
+padding: .35em 1.2em;
+text-transform: uppercase;
+}
+.cover-title {
+font-size: clamp(1.8rem, 5vw, 3.2rem);
+font-weight: 900;
+line-height: 1.2;
+color: var(--ink);
+position: relative;
+}
+.cover-title span { color: var(--gold); }
+.cover-sub {
+font-size: 1rem;
+color: var(--accent);
+line-height: 1.8;
+}
+.cover-meta {
+display: flex; gap: 2.5rem; flex-wrap: wrap; justify-content: center;
+font-family: 'JetBrains Mono', monospace;
+font-size: .82rem; color: var(--accent);
+}
+.cover-meta div { display: flex; flex-direction: column; gap: .2rem; align-items: center; }
+.cover-meta strong { font-size: 1.4rem; color: var(--ink); font-family: 'Noto Serif TC', serif; font-weight: 900; }
+.btn-start {
+margin-top: 1rem;
+background: var(--ink);
+color: var(--paper);
+border: none;
+padding: 1em 3em;
+font-family: 'Noto Serif TC', serif;
+font-size: 1.05rem;
+font-weight: 600;
+cursor: pointer;
+letter-spacing: .05em;
+transition: background .2s, transform .1s;
+position: relative;
+}
+.btn-start::after {
+content: '';
+position: absolute;
+bottom: -4px; right: -4px;
+width: 100%; height: 100%;
+border: 2px solid var(--gold);
+pointer-events: none;
+}
+.btn-start:hover { background: var(--accent); transform: translate(-2px,-2px); }
+.divider { width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+/* ── QUIZ ── */
+#quiz { display: none; min-height: 100vh; padding: 2rem 1rem 4rem; }
+
+.progress-bar-wrap {
+position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+height: 4px; background: var(--paper2);
+}
+.progress-bar-fill {
+height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
+transition: width .4s ease;
+}
+.quiz-header {
+position: fixed; top: 4px; left: 0; right: 0; z-index: 98;
+background: rgba(245,240,232,.95);
+backdrop-filter: blur(6px);
+border-bottom: 1px solid var(--line);
+display: flex; align-items: center; justify-content: space-between;
+padding: .6rem 1.5rem;
+font-family: 'JetBrains Mono', monospace;
+font-size: .82rem;
+}
+.quiz-counter { color: var(--accent); }
+.quiz-score-live { color: var(--gold); font-weight: 700; }
+.quiz-timer { color: var(--ink); }
+
+.question-card {
+max-width: 780px;
+margin: 5.5rem auto 0;
+animation: fadeUp .3s ease;
+}
+@keyframes fadeUp {
+from { opacity:0; transform: translateY(14px); }
+to { opacity:1; transform: translateY(0); }
+}
+
+.q-meta {
+display: flex; justify-content: space-between; align-items: center;
+margin-bottom: .8rem;
+font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+color: var(--accent);
+}
+.q-score-badge {
+background: var(--ink); color: var(--gold);
+padding: .15em .7em; font-size: .7rem;
+}
+
+.question-box {
+background: white;
+border: 1.5px solid var(--line);
+border-left: 5px solid var(--gold);
+padding: 1.4rem 1.6rem;
+margin-bottom: 1.2rem;
+box-shadow: 4px 4px 0 var(--shadow);
+font-size: 1rem;
+line-height: 1.85;
+font-weight: 600;
+}
+
+.options { display: flex; flex-direction: column; gap: .7rem; }
+
+.option-btn {
+display: flex; align-items: flex-start; gap: .9rem;
+background: white;
+border: 1.5px solid var(--line);
+padding: .9rem 1.1rem;
+cursor: pointer;
+text-align: left;
+font-family: 'Noto Serif TC', serif;
+font-size: .95rem;
+line-height: 1.7;
+transition: border-color .15s, background .15s, transform .1s;
+position: relative;
+box-shadow: 2px 2px 0 var(--shadow);
+}
+.option-btn:hover:not(:disabled) {
+border-color: var(--gold);
+background: #fdf8ef;
+transform: translate(-1px,-1px);
+box-shadow: 3px 3px 0 var(--shadow);
+}
+.option-btn:disabled { cursor: default; }
+.option-label {
+font-family: 'JetBrains Mono', monospace;
+font-weight: 700;
+font-size: .82rem;
+min-width: 1.6rem;
+color: var(--accent);
+padding-top: .12em;
+flex-shrink: 0;
+}
+.option-btn.correct {
+background: #eaf7ec;
+border-color: var(--green);
+box-shadow: 2px 2px 0 rgba(42,122,58,.2);
+}
+.option-btn.correct .option-label { color: var(--green); }
+.option-btn.wrong {
+background: #fdf0f0;
+border-color: var(--red);
+box-shadow: 2px 2px 0 rgba(184,50,50,.2);
+}
+.option-btn.wrong .option-label { color: var(--red); }
+.option-btn.reveal-correct {
+background: #f0faf2;
+border-color: var(--green);
+border-style: dashed;
+}
+.option-btn.reveal-correct .option-label { color: var(--green); }
+
+.feedback-row {
+display: flex; align-items: center; gap: .8rem;
+margin-top: 1rem;
+padding: .7rem 1rem;
+font-size: .9rem;
+font-weight: 600;
+animation: fadeUp .2s ease;
+}
+.feedback-correct { color: var(--green); background: #eaf7ec; border-left: 4px solid var(--green); }
+.feedback-wrong { color: var(--red); background: #fdf0f0; border-left: 4px solid var(--red); }
+.feedback-icon { font-size: 1.2rem; }
+
+.nav-row {
+display: flex; justify-content: flex-end; margin-top: 1.4rem; gap: .8rem;
+}
+.btn-next, .btn-skip {
+border: 1.5px solid var(--ink);
+background: transparent;
+color: var(--ink);
+padding: .6em 1.8em;
+font-family: 'Noto Serif TC', serif;
+font-size: .9rem;
+cursor: pointer;
+transition: background .15s, color .15s;
+}
+.btn-next:hover { background: var(--ink); color: var(--paper); }
+.btn-skip { border-color: var(--line); color: var(--accent); font-size: .82rem; }
+.btn-skip:hover { background: var(--paper2); }
+
+/* ── RESULT ── */
+#result { display: none; min-height: 100vh; padding: 3rem 1.5rem; }
+.result-wrap { max-width: 700px; margin: 0 auto; }
+.result-head { text-align: center; margin-bottom: 2.5rem; }
+.result-score-ring {
+width: 160px; height: 160px;
+border-radius: 50%;
+border: 6px solid var(--gold);
+display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+margin: 0 auto 1.5rem;
+background: white;
+box-shadow: 0 0 0 12px var(--paper2), 0 0 0 14px var(--line);
+}
+.result-score-num { font-size: 2.8rem; font-weight: 900; color: var(--ink); line-height: 1; }
+.result-score-denom { font-size: .85rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+.result-grade { font-size: 1.6rem; font-weight: 900; margin: .5rem 0; }
+.result-stats {
+display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+margin: 1rem 0 2rem;
+font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+}
+.result-stat { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
+.result-stat strong { font-size: 1.3rem; font-family: 'Noto Serif TC', serif; }
+.btn-review, .btn-restart {
+padding: .7em 2em;
+font-family: 'Noto Serif TC', serif; font-size: .95rem;
+cursor: pointer; border: none; margin: .4rem;
+}
+.btn-restart { background: var(--ink); color: var(--paper); }
+.btn-restart:hover { background: var(--accent); }
+.btn-review { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); }
+.btn-review:hover { background: var(--paper2); }
+
+/* Review list */
+.review-section { margin-top: 2.5rem; }
+.review-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 1rem; padding-bottom: .4rem; border-bottom: 2px solid var(--gold); }
+.review-item {
+background: white; border: 1.5px solid var(--line);
+padding: 1rem 1.2rem; margin-bottom: .9rem;
+border-left: 4px solid var(--line);
+}
+.review-item.ri-wrong { border-left-color: var(--red); }
+.review-item.ri-correct{ border-left-color: var(--green); }
+.ri-q { font-weight: 600; font-size: .92rem; line-height: 1.7; margin-bottom: .5rem; }
+.ri-row { font-size: .83rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+.ri-correct-ans { color: var(--green); font-weight: 700; }
+.ri-wrong-ans { color: var(--red); font-weight: 700; }
+
+@media(max-width:600px){
+.question-box { font-size: .9rem; padding: 1rem 1rem; }
+.option-btn { font-size: .88rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section id="cover">
+<div class="cover-badge">台灣金融研訓院</div>
+<div class="divider"></div>
+<h1 class="cover-title">第 12 屆<br><span>風險管理</span>基本能力測驗</h1>
+<p class="cover-sub">科目：風險管理制度與實務<br>選項順序隨機 · 題目順序隨機</p>
+<div class="divider"></div>
+<div class="cover-meta">
+<div><strong>60</strong>題目總數</div>
+<div><strong>100</strong>滿分</div>
+<div><strong>1.5／2</strong>每題配分</div>
+</div>
+<button class="btn-start" onclick="startQuiz()">開始測驗</button>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+<div class="quiz-header">
+<span class="quiz-counter" id="qCounter">第 1 題 / 60</span>
+<span class="quiz-timer" id="qTimer">00:00</span>
+<span class="quiz-score-live" id="qScoreLive">得分 0</span>
+</div>
+<div class="question-card" id="questionCard"></div>
+</section>
+
+<!-- RESULT -->
+<section id="result">
+<div class="result-wrap">
+<div class="result-head">
+<div class="result-score-ring">
+<div class="result-score-num" id="rScore">0</div>
+<div class="result-score-denom">/ 100 分</div>
+</div>
+<div class="result-grade" id="rGrade">—</div>
+<div class="result-stats">
+<div class="result-stat"><strong id="rCorrect">0</strong>答對</div>
+<div class="result-stat"><strong id="rWrong">0</strong>答錯</div>
+<div class="result-stat"><strong id="rTime">—</strong>用時</div>
+</div>
+<button class="btn-restart" onclick="restartQuiz()">🔄 重新測驗</button>
+<button class="btn-review" onclick="toggleReview()">📋 查看解析</button>
+</div>
+<div class="review-section" id="reviewSection" style="display:none"></div>
+</div>
+</section>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const rawQuestions = [
+// Q1-40 1.5分
+{id:1, pts:1.5, q:'「借長貸短」的資金部位，可能存在何種風險？', opts:['再投資風險','再融資風險','市場價值風險','信用風險'], ans:1},
+{id:2, pts:1.5, q:'原則上，銀行的自有資本對風險性資產的比率愈高時，其承擔的資本風險將如何變化？', opts:['愈大','愈小','不變','無關'], ans:1},
+{id:3, pts:1.5, q:'大衛是美國的投資者，購買一張德國債券 1,000 歐元，購買當時的即期匯率為 1 歐元兌換 1.25 美元，經過了一年，歐元升值至 1 歐元兌換 1.5385 美元，請問此投資者來自匯率變動的損益如何？', opts:['獲利 288.5 美元','損失 288.5 美元','獲利 288.5 歐元','損失 288.5 歐元'], ans:0},
+{id:4, pts:1.5, q:'有關績效評量，下列哪些單位不適用利潤中心制？ A.資訊處 B.人力資源處 C.總務處 D.法令遵循處', opts:['僅 D','僅 ABD','僅 BCD','ABCD'], ans:3},
+{id:5, pts:1.5, q:'有關資金移轉價格，下列敘述何者較不適當？', opts:['全行的會計利潤係指「本期損益」，用來描述銀行在某段經營期間的經營成果','銀行營業單位所稱的營運利潤，包括內部損益與外部損益','銀行的聯行往來政策，應優先追求閒置資金的利潤極大化','存放款顧客的價格簡稱存款利率與放款利率，是藉由內部移轉價格加減利潤目標而訂定'], ans:2},
+{id:6, pts:1.5, q:'下列何者不屬於「責任中心體系」的分類要素？', opts:['區域中心','成本（費用）中心','利潤中心','投資中心'], ans:0},
+{id:7, pts:1.5, q:'銀行整合組織目標與部門目標之管理機制，下列敘述何者錯誤？', opts:['單軌制的內部轉撥價格相較於多軌制的內部轉撥價格更能正確反映政策目標','根據風險資本的配置系統(Capital allocation system)，應將營業單位、業務項目和交易活動的所有風險，緊密地與銀行自有資本搭配','各項業務及主管的風險權限若按「風險值」衡量，對風險資本的配置與績效目標有否達成的研判可更加客觀','總行財務處可以使用聯行往來的資金調撥系統，剖析分行等營業單位的營運利潤，並引導各項業務配合全行的經營政策'], ans:0},
+{id:8, pts:1.5, q:'下列何者是合理的風險管理觀念？', opts:['不宜使用相同風險標準看待所有員工，但部屬的責任要大於主管','組織的前台與中台部門均要面對風險挑戰，只有後台部門不用','風險管理的決策，「從上而下」比「由下往上」的重要','風險產生單位與監督單位不宜相互隸屬，使用風險管理指標和標準也應不同'], ans:3},
+{id:9, pts:1.5, q:'本國銀行以「內保外貸」承作陸資企業授信之運作模式，係指下列何者？', opts:['借款企業需提供外資銀行開立的擔保信用狀，擔保該借款客戶履行合約義務或責任','借款企業之負責人需提供連帶保證，擔保該借款客戶履行合約義務或責任','借款企業需提供銀行存單做為放款之擔保品','借款企業需提供其境外子公司做為放款擔保人，共同承擔履約義務'], ans:0},
+{id:10, pts:1.5, q:'關於財務比率分析，下列敘述何者錯誤？', opts:['企業預付費用變高而導致速動比率降低時，其短期償債能力即變差','企業財務槓桿比率愈高，承擔之財務風險即愈大','企業存貨週轉率愈高，意味庫存管理能力愈差及資金積壓愈多','企業應收帳款週轉率愈高，意味現金回收速度即越快'], ans:2},
+{id:11, pts:1.5, q:'銀行接受廠商委託，向國外商品勞務的賣方簽定「即期跟單匯票」，於完成信用狀約定下，先行墊付款項。然後，通知借款人在合理期限內「備款贖單」之票據融通方式，稱為哪種業務？', opts:['墊付國內票款','墊付出口票款','出口押匯','進口押匯'], ans:3},
+{id:12, pts:1.5, q:'根據 2020 年 12 月底的統計數據，消費性貸款中，哪項業務承作金額最多？', opts:['購置住宅貸款','房屋修繕貸款','汽車貸款','信用卡循環信用餘額'], ans:0},
+{id:13, pts:1.5, q:'關於房屋淨值放款，下列敘述何者錯誤？', opts:['有時稱為二胎房貸，還款方式不屬於「封閉式信用貸款」','求償權居於第二順位','以房屋市場價值而非房屋淨值，當作抵押品','房屋淨值是由房屋市場價值與第一順位抵押借款餘額相減而得'], ans:2},
+{id:14, pts:1.5, q:'企業想在國外發行普通公司債、轉換公司債與存託憑證，適宜接觸何種信用評等機構？', opts:["Joint Credit Information Center;JCIC","Taiwan Ratings Corp.;TRC","Moody's","Taiwan Economic Journal;TEJ"], ans:2},
+{id:15, pts:1.5, q:'銀行藉由內部評等模型計算出的風險限額，稱為下列何者？', opts:['信用風險值','違約機率','逾放比率','市場風險值'], ans:0},
+{id:16, pts:1.5, q:'銀行法對「利害關係人」之規範，下列敘述何者錯誤？', opts:['適用同一授信客戶之每筆或累計擔保授信金額達新臺幣 1 億元以上或銀行淨值 1%孰低者','對同一法人之擔保授信總餘額，不得超過銀行淨值 10%','對同一自然人之擔保授信總餘額，不得超過銀行淨值 2%','對所有利害關係人之擔保授信總餘額，不得超過銀行淨值二倍'], ans:3},
+{id:17, pts:1.5, q:'銀行授信或風險管理主管依主觀經驗與判斷，考量借戶有否警示性財務比率、重複計算定性指標的分數、黑名單等資訊，並做等級調整，屬於何種評等？', opts:['基本模型的評等','授信戶的個別評等','授信特徵評等','財務評等'], ans:1},
+{id:18, pts:1.5, q:'銀行在信用風險集中度的授信架構，將授信對象分成哪三種層面做總風險限額的控管？', opts:['自然人、法人與集團企業','大型企業、中型企業與小型企業','優等客戶、一般客戶與高風險客戶','客戶、產業與國家別分類'], ans:3},
+{id:19, pts:1.5, q:'銀行公會針對中小型企業的信用評分，構面包括財務狀況、經營管理，以及產業特性暨展望三項，此三項構面的評分比重為何？', opts:['50%、30%及 20%','40%、40%及 20%','40%、30%及 30%','30%、30%及 40%'], ans:1},
+{id:20, pts:1.5, q:'歐債危機時期，歐豬國家(PIIGS)經濟金融受到明顯衝擊，下列哪個不屬於歐豬國家？', opts:['西班牙','捷克','義大利','愛爾蘭'], ans:1},
+{id:21, pts:1.5, q:'S & P 國際信評機構的國家主權評等，攸關等級制度，下列敘述何者正確？ A.分成投資級與投機級兩大類 B.信用等級介於 AA 與 CCC 之間者，相同等級再細分三個層級 C.旨在反映各國「主權債」的償還能力 D.旨在反映各國政府機關所發行「權益證券」的信用品質', opts:['僅 ABC','僅 BCD','僅 ABD','ABCD'], ans:0},
+{id:22, pts:1.5, q:'國家風險的演進，大致分為三個階段涵蓋三種風險概念，下列哪項內容不符合此風險概念？', opts:['匯率風險','國家風險','外匯移轉風險','主權風險'], ans:0},
+{id:23, pts:1.5, q:'依據銀行資本適足性及資本等級管理辦法，本國銀行之普通股權益比率，自 108 年起不得低於多少？', opts:['6.375%','7.00%','8.50%','10.50%'], ans:1},
+{id:24, pts:1.5, q:'票券金融公司的資本適足率在 13%以上時，辦理短期票券之保證、背書總餘額不得超過公司淨值多少？', opts:['4 倍','5 倍','5.5 倍','6 倍'], ans:2},
+{id:25, pts:1.5, q:'證券商向主管機關申請經營衍生性業務時，最近六個月每月申報的資本適足率均須超過下列何者？', opts:['100%','150%','200%','250%'], ans:2},
+{id:26, pts:1.5, q:'下列何種風險較不屬於人身保險業的風險項目？', opts:['資產風險','信用風險','保險風險','利率風險'], ans:1},
+{id:27, pts:1.5, q:'下列何種違約屬於「尚未履行付款義務」的違約？ A.逾期放款 B.經濟違約 C.技術性違約 D.預借現金 E.催收款', opts:['僅 AB','僅 AE','僅 ACD','僅 CDE'], ans:1},
+{id:28, pts:1.5, q:'客戶申貸時，提供第三人保證可提升銀行或有債權，假設借款人與保證人的違約機率分別為 1%與 0.5%，隨著第三人保證，承貸銀行的違約機率成為下列何者？', opts:['1.50%','1.00%','0.01%','0.005%'], ans:3},
+{id:29, pts:1.5, q:'有關信用風險之暴險部位，下列敘述何者錯誤？', opts:['暴險部位依業務性質，分成表內與表外暴險','信用額度內尚未動用的授信資產，客戶隨時可能動用，致使銀行承擔「或有」的再融資風險，但此項餘額免列示於公開說明書','表內業務之暴險部位，係指客戶目前使用之融資餘額','計提信用風險資本需求額的標準法，係以表內項目之「帳面金額」乘以風險權數，來表達「風險性資產」'], ans:1},
+{id:30, pts:1.5, q:'計算非衍生性業務之信用風險性資產時，計算過程不包含下列何者？', opts:['信用相當額','交易金額','暴險額','風險權數'], ans:2},
+{id:31, pts:1.5, q:'假設常態情況的容忍水準為 1%，殖利率之標準差為 0.5%，敏感性係數β為 0.5，下列敘述何者正確？', opts:['VaR=0-2.325×1×0.005','VaR=0-2.325×1×0.01','VaR=0-2.325×0.5×0.01','VaR=0-2.325×0.5×0.005'], ans:3},
+{id:32, pts:1.5, q:'已知債券市值為 10,000 元，PVBP(Present Value of One Basis Point)為 5。利率若上升 10 基點(basis point)，債券價格將成為下列何者？', opts:['9,995 元','9,950 元','10,005 元','10,050 元'], ans:1},
+{id:33, pts:1.5, q:'有關銀行的放款對存款之比率（簡稱存放比率），下列敘述何者錯誤？', opts:['存放比率愈高，意味銀行的流動性愈低','存放比率愈高，意味銀行的流動能力愈強','存放比率愈高，意味銀行的流動性風險愈大','存放款業務為主的銀行，存放比率仍具相當參考價值'], ans:1},
+{id:34, pts:1.5, q:'銀行之流動性風險與利率風險管理的監督指標，下列敘述何者錯誤？', opts:['存款準備與流動準備，係與利率風險有關的準備部位','存款準備與流動準備，係與流動性風險有關的準備部位','利率風險以資產負債的「利率敏感性和非敏感性」為基準，設置缺口指標','流動性風險以現金流入與流出相減的「淨現金流量」為基礎，設置缺口指標'], ans:0},
+{id:35, pts:1.5, q:'有關利率風險管理的重新訂價缺口指標，下列敘述何者錯誤？', opts:['類似流動性缺口指標是以不同天期「累計」概念衡量','實務上，利率風險的缺口指標，適合觀察個別營業單位','實務上，利率風險的缺口指標，均以全行或其銀行簿的部位為主','部位幣別以新臺幣與美金計價兩種為主，人民幣計價的部位為輔'], ans:1},
+{id:36, pts:1.5, q:'下列何者非屬金融機構的作業風險監督機構？', opts:['金管會銀行局','金管會檢查局','中央銀行','內政部警政署'], ans:3},
+{id:37, pts:1.5, q:'有關作業風險的標準法，下列敘述何者錯誤？', opts:['依八種業務類別，設定計提指標','每種業務類別均以「營業毛利」作為計提指標','風險係數介於 12%與 18%之間','利用各類業務之營業利益，乘以對應的風險係數，作為「資本計提額」'], ans:3},
+{id:38, pts:1.5, q:'第二類資本之合計數額不包含下列哪一種？', opts:['長期次順位債券','特別盈餘公積','可轉換之次順位債券','營業準備及備抵呆帳'], ans:1},
+{id:39, pts:1.5, q:'「信用風險加權風險性資產」主要是因下列何種狀況導致銀行產生損失？', opts:['股票價格下跌','債券價格下跌','債券評等下跌','交易對手不履約'], ans:3},
+{id:40, pts:1.5, q:'IFRS 9 的估計方式以下列何者為基礎？', opts:['歷史損失經驗模式','有限損失認列模式','預期信用損失模式','實際損失認列模式'], ans:2},
+
+// Q41-60 2分
+{id:41, pts:2, q:'有關市場風險，下列敘述何者錯誤？', opts:['外匯由各國央行發行，因此外匯無個別市場風險，毋須計提此類風險的資本需求額，只計提一般市場風險的資本需求額','一般市場風險反映總體經濟產生的價格波動','個別市場風險反映金融工具產生的價格波動','石油、貴金屬的價格波動風險，係由個別市場風險及一般市場風險構成'], ans:0},
+{id:42, pts:2, q:'甲銀行投資 1 億元債券，年利率 3%，同時發行 1 億元定期存單，年利率 2%，請問此交易一季的淨利息利潤為多少？', opts:['$250,000','$1,000,000','$1,500,000','$1,750,000'], ans:0},
+{id:43, pts:2, q:'有關營運利潤、會計利潤和財務利潤，下列敘述何者正確？', opts:['財務利潤＝營運利潤＋會計利潤','會計利潤＝營運利潤＋財務利潤','營運利潤＝財務利潤＋會計利潤','三者非屬相同會計基礎，無法衡量'], ans:1},
+{id:44, pts:2, q:'銀行分行（營業單位）主要收入來源不包括下列何者？', opts:['供應多餘內部資金時，按照供應利率賺取的利息收入','手續費收入','承作授信業務的放款利息收入','調撥資金產生之財務投資收入'], ans:3},
+{id:45, pts:2, q:'甲企業 2019 年 12 月 31 日的流動資產為 85,951 萬元，其中現金及約當現金 35,664 萬元、應收票據及帳款淨額 28,180 萬元、存貨 10,968 萬元、預付費用 125 萬元、其他流動資產 11,014 萬元。負債總額 79,219 萬元，除長期負債 38,030 萬元外，其餘為流動負債，請問該公司的速動比率為何？（四捨五入取最接近值）', opts:['209%','199%','182%','185%'], ans:2},
+{id:46, pts:2, q:'Basel II 及 III 在世界各國推動以來，國際性銀行即朝向標準法和內部評等法併行發展，但實施內部評等法的銀行估計違約機率時，須搭配多少年以上之授信資料？', opts:['2 年','5 年','7 年','10 年'], ans:1},
+{id:47, pts:2, q:'假設 ARMs 定儲利率指數為 2.5%，銀行承作房貸之成本加碼為 2.55%，違約風險相關之信用等級加碼為 1%，請根據 ARMs 房貸之利率訂價方式，計算房貸利率為何？', opts:['6.05%','5.05%','3.55%','3.50%'], ans:1},
+{id:48, pts:2, q:'有關自用住宅貸款的敘述，下列何者錯誤？', opts:['借戶於寬限期只付本金、不付利息','「指數型」房屋貸款的利率，通常浮動計價、而非固定','無自用住宅者購買自用住宅之放款，借款期別可視需要超過 30 年','此項貸款通常以房屋作為擔保品，簡稱「抵押貸款」'], ans:0},
+{id:49, pts:2, q:'依據標準普爾信用評等機構之觀點，下列哪些指標可以衡量受評公司之現金流量是否足夠？ A.營業利益／營業收入 B.長短期借款／總資產 C.（正常營業活動的現金流量＋利息費用）／利息費用 D.借款的還本期限', opts:['僅 CD','僅 AD','僅 BCD','ABCD'], ans:0},
+{id:50, pts:2, q:"有關 Moody's 對公司債等級的定量分析，下列敘述何者正確？ A.主要指標為利息保障倍數 B.主要指標為經營效能 C.次要指標為短期償債能力，財務指標是負債比率與財務槓桿比率 D.次要指標為長期償債能力，用以判斷公司是否舉債過多", opts:['僅 AC','僅 BC','僅 AD','僅 CD'], ans:2},
+{id:51, pts:2, q:'銀行為提高普通股權益比率，可採用下列哪些措施？ A.現金增資 B.盈餘轉增資 C.不動產重估 D.發行可轉換次順位債券', opts:['僅 AB','僅 CD','僅 BCD','ABCD'], ans:0},
+{id:52, pts:2, q:'有關淨穩定資金比率，下列敘述何者錯誤？', opts:['為短期流動性量化指標','定義為可取得的穩定資金除以法定穩定資金','強調支應業務活動的資金，須一定比率來自穩定負債','自 107 年 1 月 1 日實施'], ans:0},
+{id:53, pts:2, q:'銀行因資本適足率而受到之業務規範與限制，下列敘述何者正確？ A.投資金融相關事業，其屬同一業別者，以一家為限 B.資本適足等級之銀行可發行現金儲值卡，惟金管會可限制該資本適足等級之銀行，只辦「避險」目的之衍生性業務，不可承作「交易目的」 C.申請轉投資金融相關事業的資本計提，自 2020 年開始改採國際作法，細分成重大投資、非重大投資及交叉持股三部分 D.銀行的資本等級屬於資本顯著不足，不得使用現金分配盈餘，惟可以現金買回流通在外股份', opts:['僅 AC','僅 BC','僅 AD','僅 CD'], ans:0},
+{id:54, pts:2, q:'有關授信案之回收風險，下列敘述何者錯誤？', opts:['銀行訴諸法律，用意在請求法院裁定財產之處分權，以回收相關借款','擔保品及第三人保證，是因應違約發生採取之債權保障措施，為備而不用之風險管理制度','客戶違約時，銀行沒收或出售擔保品，以降低或消除信用損失，同時將信用風險移轉為回收風險與資產價值風險','回收風險具體反映在擔保品之帳面價值'], ans:3},
+{id:55, pts:2, q:'銀行的授信客戶集中在信用等級不佳的企業，常理上使用何種方法，計提的資本額較少？', opts:['內部模型法','內部評等法','標準法','與計提方法無關'], ans:2},
+{id:56, pts:2, q:'A 銀行的表內項目及表外項目，信用風險性資產分別為新臺幣 1,500 億元與 500 億元，依現行規定須計提多少資本？', opts:['210 億元','160 億元','158 億元','120 億元'], ans:0},
+{id:57, pts:2, q:'全行的「市場風險」，依據巴賽爾委員會與金管會規範，係指資產負債表的表內及表外部位，因市場價格變動，而可能產生的已實現和未實現的損失。所稱市場價格之變動，下列敘述何者錯誤？', opts:['市場利率','市場匯率','股票價格','金融負債短部位'], ans:3},
+{id:58, pts:2, q:'假設英國政府發行 5 年期零息債券，到期一次還本、面額 1 百萬英鎊，市場顯示相同風險等級之 5 年期殖利率為 6%。當殖利率上升 1%時，由敏感性係數估算之債券價值變化，下列何者正確？', opts:['約-35,200 英鎊','約+35,200 英鎊','約-37,400 英鎊','約+37,400 英鎊'], ans:0},
+{id:59, pts:2, q:'銀行財務部門的交易員，因參與資金調撥或買賣過程，須承擔價格風險責任，則下列敘述何者錯誤？', opts:['交易員通常依資金部位之交易對象和商品種類區分','交易員依交易對象區分，可分為同業互拆交易員和公司戶交易員','交易員依商品種類區分，可分為固定收益證券交易員、權益證券交易員和外匯交易員','當交易發生違約，相關交易員不須承擔信用風險，但須承擔價格風險'], ans:3},
+{id:60, pts:2, q:'觀察銀行是否存在嚴重的流動性風險，下列敘述何者錯誤？', opts:['對外籌資窒礙難行，組織內部彼此牽制，推動困難','借款客戶嚴重違約，導致銀行發生擠兌，宣告破產','存款客戶嚴重違約，導致銀行發生擠兌，宣告破產，俗稱致命性風險(Fatal Risk)','銀行資產負債項目，長短期結構不一致，呈現負缺口部位愈來愈大'], ans:2},
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let questions = [];
+let current = 0;
+let score = 0;
+let results = [];
+let answered = false;
+let timerInterval = null;
+let elapsed = 0;
+let shuffledOptionMaps = []; // [{shuffledOpts, correctShuffledIdx}]
+
+function shuffle(arr) {
+const a = [...arr];
+for (let i = a.length-1; i>0; i--) {
+const j = Math.floor(Math.random()*(i+1));
+[a[i],a[j]] = [a[j],a[i]];
+}
+return a;
+}
+
+function prepareQuestions() {
+questions = shuffle(rawQuestions);
+shuffledOptionMaps = questions.map(q => {
+const idxs = [0,1,2,3];
+const shuffled = shuffle(idxs);
+const correctShuffled = shuffled.indexOf(q.ans);
+return { shuffledIdxs: shuffled, correctShuffledIdx: correctShuffled };
+});
+}
+
+// ══════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════
+function startTimer() {
+elapsed = 0;
+clearInterval(timerInterval);
+timerInterval = setInterval(() => {
+elapsed++;
+const m = String(Math.floor(elapsed/60)).padStart(2,'0');
+const s = String(elapsed%60).padStart(2,'0');
+document.getElementById('qTimer').textContent = m+':'+s;
+}, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+function formatTime(sec) {
+const m = Math.floor(sec/60);
+const s = sec%60;
+return `${m}分${s}秒`;
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function renderQuestion() {
+const q = questions[current];
+const map = shuffledOptionMaps[current];
+answered = false;
+
+const pct = (current/60)*100;
+document.getElementById('progressBar').style.width = pct+'%';
+document.getElementById('qCounter').textContent = `第 ${current+1} 題 / 60`;
+document.getElementById('qScoreLive').textContent = `得分 ${score.toFixed(1)}`;
+
+const labels = ['(1)','(2)','(3)','(4)'];
+let optsHTML = map.shuffledIdxs.map((origIdx, si) => {
+return `<button class="option-btn" onclick="selectOption(${si})" data-si="${si}">
+<span class="option-label">${labels[si]}</span>
+<span>${q.opts[origIdx]}</span>
+</button>`;
+}).join('');
+
+document.getElementById('questionCard').innerHTML = `
+<div class="q-meta">
+<span>第 ${q.id} 題（原始編號）</span>
+<span class="q-score-badge">配分 ${q.pts} 分</span>
+</div>
+<div class="question-box">${q.q}</div>
+<div class="options">${optsHTML}</div>
+<div id="feedback"></div>
+<div class="nav-row">
+<button class="btn-skip" onclick="skipQuestion()">跳過此題 →</button>
+<button class="btn-next" id="btnNext" onclick="nextQuestion()" style="display:none">下一題 →</button>
+</div>
+`;
+}
+
+function selectOption(si) {
+if (answered) return;
+answered = true;
+const q = questions[current];
+const map = shuffledOptionMaps[current];
+const isCorrect = (si === map.correctShuffledIdx);
+
+document.querySelectorAll('.option-btn').forEach((btn,i) => {
+btn.disabled = true;
+if (i === map.correctShuffledIdx) btn.classList.add(isCorrect ? 'correct' : 'reveal-correct');
+if (i === si && !isCorrect) btn.classList.add('wrong');
+});
+
+const fb = document.getElementById('feedback');
+if (isCorrect) {
+score += q.pts;
+document.getElementById('qScoreLive').textContent = `得分 ${score.toFixed(1)}`;
+fb.innerHTML = `<div class="feedback-row feedback-correct"><span class="feedback-icon">✓</span> 答對！獲得 ${q.pts} 分</div>`;
+results.push({ q, userSi: si, correctSi: map.correctShuffledIdx, correct: true, shuffledIdxs: map.shuffledIdxs });
+} else {
+const correctOrigLabel = q.opts[map.shuffledIdxs[map.correctShuffledIdx]];
+fb.innerHTML = `<div class="feedback-row feedback-wrong"><span class="feedback-icon">✗</span> 答錯！正確答案：${correctOrigLabel}</div>`;
+results.push({ q, userSi: si, correctSi: map.correctShuffledIdx, correct: false, shuffledIdxs: map.shuffledIdxs });
+}
+
+document.getElementById('btnNext').style.display = '';
+}
+
+function skipQuestion() {
+if (!answered) {
+results.push({ q: questions[current], userSi: -1, correctSi: shuffledOptionMaps[current].correctShuffledIdx, correct: false, skipped: true, shuffledIdxs: shuffledOptionMaps[current].shuffledIdxs });
+nextQuestion();
+}
+}
+
+function nextQuestion() {
+current++;
+if (current >= 60) {
+endQuiz();
+} else {
+renderQuestion();
+}
+}
+
+// ══════════════════════════════════════════
+// START / END
+// ══════════════════════════════════════════
+function startQuiz() {
+prepareQuestions();
+current = 0; score = 0; results = [];
+document.getElementById('cover').style.display = 'none';
+document.getElementById('quiz').style.display = 'block';
+startTimer();
+renderQuestion();
+}
+
+function endQuiz() {
+stopTimer();
+document.getElementById('quiz').style.display = 'none';
+document.getElementById('result').style.display = 'block';
+
+const correct = results.filter(r=>r.correct).length;
+const wrong = results.filter(r=>!r.correct).length;
+const scoreRnd = Math.round(score * 10) / 10;
+
+document.getElementById('rScore').textContent = scoreRnd;
+document.getElementById('rCorrect').textContent = correct;
+document.getElementById('rWrong').textContent = wrong;
+document.getElementById('rTime').textContent = formatTime(elapsed);
+
+let grade = '';
+if (scoreRnd >= 90) grade = '🏆 優秀';
+else if (scoreRnd >= 70) grade = '✅ 及格';
+else if (scoreRnd >= 60) grade = '⚠️ 邊緣';
+else grade = '❌ 未及格';
+document.getElementById('rGrade').textContent = grade;
+}
+
+function restartQuiz() {
+document.getElementById('result').style.display = 'none';
+document.getElementById('reviewSection').style.display = 'none';
+startQuiz();
+}
+
+function toggleReview() {
+const sec = document.getElementById('reviewSection');
+if (sec.style.display !== 'none') { sec.style.display = 'none'; return; }
+
+const labels = ['(1)','(2)','(3)','(4)'];
+let html = '<div class="review-title">逐題解析</div>';
+results.forEach((r, i) => {
+const cls = r.correct ? 'ri-correct' : 'ri-wrong';
+const correctText = r.q.opts[r.shuffledIdxs[r.correctSi]];
+const userText = r.userSi >= 0 ? r.q.opts[r.shuffledIdxs[r.userSi]] : '（未作答）';
+html += `<div class="review-item ${cls}">
+<div class="ri-q">第${i+1}題（原始題號 ${r.q.id}）：${r.q.q}</div>
+<div class="ri-row">正確答案：<span class="ri-correct-ans">${correctText}</span></div>
+${!r.correct ? `<div class="ri-row">你的作答：<span class="ri-wrong-ans">${userText}</span></div>` : ''}
+</div>`;
+});
+sec.innerHTML = html;
+sec.style.display = 'block';
+sec.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
